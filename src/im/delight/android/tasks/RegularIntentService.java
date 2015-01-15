@@ -16,9 +16,11 @@ package im.delight.android.tasks;
  * limitations under the License.
  */
 
+import android.os.Build;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Random;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -50,6 +52,7 @@ abstract public class RegularIntentService extends IntentService {
 		super("RegularIntentService");
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	protected final void onHandleIntent(Intent intent) {
 		// get access to the preferences
@@ -66,7 +69,12 @@ abstract public class RegularIntentService extends IntentService {
 			// update the time of the last execution in the preferences
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putLong(getLastExecutionPreference(), lastExecutionTime);
-			editor.apply();
+			if (Build.VERSION.SDK_INT >= 9) {
+				editor.apply();
+			}
+			else {
+				editor.commit();
+			}
 
 			// perform the actual tasks
 			run(intent);
